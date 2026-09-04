@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>線上行事曆</title>
+  <style>
+    :root {
+      --bg-color: #f7f9fc;
+      --card-bg: #ffffff;
+      --primary: #4a90e2;
+      --text-main: #2c3e50;
+      --border-color: #e2e8f0;
+      --today-bg: #edf2f7;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 900px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 24px; }
+    
+    /* Header & Navigation */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header h2 { margin: 0; font-size: 1.5rem; }
+    .nav-btn { background: #f0f4f8; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+    .nav-btn:hover { background: #e2e8f0; }
+    .today-btn { background: var(--primary); color: white; border: none; }
+    .today-btn:hover { background: #357abd; }
+
+    /* Calendar Grid */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .weekday-header { text-align: center; font-weight: bold; padding: 10px 0; color: #718096; font-size: 0.9rem; }
+    .day-cell { min-height: 100px; border: 1px solid var(--border-color); border-radius: 8px; padding: 6px; background: #fff; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; }
+    .day-cell:hover { border-color: var(--primary); }
+    .day-cell.empty { background: #fafafa; border-style: dashed; cursor: default; }
+    .day-cell.is-today { background-color: var(--today-bg); border: 2px solid var(--primary); }
+    .day-number { font-weight: bold; font-size: 0.9rem; margin-bottom: 4px; }
+    .today-badge { font-size: 0.7rem; background: var(--primary); color: white; padding: 2px 4px; border-radius: 4px; float: right; }
+
+    /* Event Badges & Notes */
+    .badge { font-size: 0.75rem; color: white; padding: 2px 6px; border-radius: 4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .note-text { font-size: 0.75rem; color: #4a5568; margin-top: 4px; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Modal Styling */
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 24px; border-radius: 10px; width: 100%; max-width: 400px; }
+    .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+    .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9rem; }
+    .btn-save { background: var(--primary); color: white; }
+    .btn-delete { background: #e53e3e; color: white; }
+    .btn-cancel { background: #cbd5e0; color: #2d3748; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div>
+      <button class="nav-btn" onclick="changeMonth(-1)">&lt; 上個月</button>
+      <button class="nav-btn" onclick="changeMonth(1)">下個月 &gt;</button>
+      <button class="nav-btn today-btn" onclick="goToToday()">今天</button>
+    </div>
+    <h2 id="monthYearDisplay"></h2>
+  </div>
+
+  <div class="calendar-grid" id="calendarGrid">
+    <div class="weekday-header">日</div>
+    <div class="weekday-header">一</div>
+    <div class="weekday-header">二</div>
+    <div class="weekday-header">三</div>
+    <div class="weekday-header">四</div>
+    <div class="weekday-header">五</div>
+    <div class="weekday-header">六</div>
+  </div>
+</div>
+
+<div class="modal" id="eventModal">
+  <div class="modal-content">
+    <h3 id="modalDateTitle">標記日期</h3>
+    <div class="form-group">
+      <label>標籤類別</label>
+      <select id="eventType">
+        <option value="值班日" data-color="#e53e3e">值班日 (紅色)</option>
+        <option value="小孩日" data-color="#3182ce">小孩日 (藍色)</option>
+        <option value="休假日" data-color="#38a169">休假日 (綠色)</option>
+        <option value="重要事項" data-color="#dd6b20">重要事項 (橘色)</option>
+        <option value="自訂類型" data-color="#805ad5">自訂類型 (紫色)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>自訂標籤名稱 (若選擇自訂類型)</label>
+      <input type="text" id="customTag" placeholder="例如：聚餐、運動">
+    </div>
+    <div class="form-group">
+      <label>備註事項</label>
+      <textarea id="eventNote" rows="3" placeholder="填寫詳細說明..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-delete" onclick="deleteEvent()" id="deleteBtn" style="display:none;">清除標記</button>
+      <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn btn-save" onclick="saveEvent()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentDate = new Date();
+  let selectedDateKey = null;
+  let events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
+
+  const monthYearDisplay = document.getElementById('monthYearDisplay');
+  const calendarGrid = document.getElementById('calendarGrid');
+  const eventModal = document.getElementById('eventModal');
+
+  function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // 設定標題
+    monthYearDisplay.textContent = `${year} 年 ${month + 1} 月`;
+
+    // 清除舊日曆（保留前7個星期標題）
+    while (calendarGrid.children.length > 7) {
+      calendarGrid.removeChild(calendarGrid.lastChild);
+    }
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // 補齊月頭空白
+    for (let i = 0; i < firstDay; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'day-cell empty';
+      calendarGrid.appendChild(emptyCell);
+    }
+
+    // 填入日期
+    const today = new Date();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+      
+      const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+      
+      if (isToday) cell.classList.add('is-today');
+
+      let cellContent = `<div class="day-number">${day}${isToday ? '<span class="today-badge">今天</span>' : ''}</div>`;
+      
+      // 載入儲存的事件
+      if (events[dateKey]) {
+        const item = events[dateKey];
+        cellContent += `<div class="badge" style="background-color: ${item.color}">${item.tag}</div>`;
+        if (item.note) {
+          cellContent += `<div class="note-text" title="${item.note}">📝 ${item.note}</div>`;
+        }
+      }
+
+      cell.innerHTML = cellContent;
+      cell.onclick = () => openModal(dateKey);
+      calendarGrid.appendChild(cell);
+    }
+  }
+
+  function changeMonth(delta) {
+    currentDate.setMonth(currentDate.getMonth() + delta);
+    renderCalendar();
+  }
+
+  function goToToday() {
+    currentDate = new Date();
+    renderCalendar();
+  }
+
+  function openModal(dateKey) {
+    selectedDateKey = dateKey;
+    document.getElementById('modalDateTitle').textContent = `${dateKey} 標記`;
+    
+    const select = document.getElementById('eventType');
+    const customInput = document.getElementById('customTag');
+    const noteInput = document.getElementById('eventNote');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    if (events[dateKey]) {
+      const item = events[dateKey];
+      noteInput.value = item.note || '';
+      deleteBtn.style.display = 'block';
+      
+      // 尋找是否為預設選單
+      let found = false;
+      for (let opt of select.options) {
+        if (opt.value === item.tag) {
+          select.value = item.tag;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        select.value = '自訂類型';
+        customInput.value = item.tag;
+      } else {
+        customInput.value = '';
+      }
+    } else {
+      select.selectedIndex = 0;
+      customInput.value = '';
+      noteInput.value = '';
+      deleteBtn.style.display = 'none';
+    }
+
+    eventModal.classList.add('active');
+  }
+
+  function closeModal() {
+    eventModal.classList.remove('active');
+  }
+
+  function saveEvent() {
+    const select = document.getElementById('eventType');
+    const selectedOption = select.options[select.selectedIndex];
+    const customTag = document.getElementById('customTag').value.trim();
+    const note = document.getElementById('eventNote').value.trim();
+
+    let tag = select.value;
+    let color = selectedOption.getAttribute('data-color');
+
+    if (tag === '自訂類型') {
+      tag = customTag || '其他';
+    }
+
+    events[selectedDateKey] = { tag, color, note };
+    localStorage.setItem('calendarEvents', JSON.stringify(events));
+    closeModal();
+    renderCalendar();
+  }
+
+  function deleteEvent() {
+    delete events[selectedDateKey];
+    localStorage.setItem('calendarEvents', JSON.stringify(events));
+    closeModal();
+    renderCalendar();
+  }
+
+  // 初次渲染
+  renderCalendar();
+</script>
+</body>
+</html>
