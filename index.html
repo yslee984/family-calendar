@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>線上行事曆</title>
 
-  <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/180/home.png">
-  <link rel="icon" type="image/png" href="https://img.icons8.com/isometric/180/home.png">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/plasticine/180/home.png">
+  <link rel="icon" type="image/png" href="https://img.icons8.com/dusk/180/home.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="家庭行事曆">
@@ -52,7 +52,6 @@
       margin: auto 0;
     }
     
-    /* Header & Navigation RWD 修正 */
     .header { 
       display: flex; 
       flex-direction: column; 
@@ -93,7 +92,6 @@
     .nav-btn:hover { background: #f7f0fa; }
     .today-btn { background: var(--primary); color: white; border: none; }
 
-    /* Calendar Grid 手機響應式優化 */
     .calendar-grid { 
       display: grid; 
       grid-template-columns: repeat(7, 1fr); 
@@ -167,10 +165,8 @@
       text-overflow: ellipsis; 
     }
 
-    /* Sync Indicator */
-    .sync-status { font-size: 0.75rem; color: #8c7aa9; text-align: center; margin-top: 10px; }
+    .sync-status { font-size: 0.75rem; color: #8c7aa9; text-align: center; margin-top: 10px; cursor: pointer; }
 
-    /* Modal Styling */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(74, 74, 106, 0.4); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 100; padding: 16px; }
     .modal.active { display: flex; }
     .modal-content { background: white; padding: 20px; border-radius: 16px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -194,6 +190,7 @@
       <button class="nav-btn" onclick="changeMonth(-1)">&lt; 上個月</button>
       <button class="nav-btn today-btn" onclick="goToToday()">今天</button>
       <button class="nav-btn" onclick="changeMonth(1)">下個月 &gt;</button>
+      <button class="nav-btn" onclick="loadCloudData()" title="手動同步數據">🔄</button>
     </div>
   </div>
 
@@ -207,7 +204,7 @@
     <div class="weekday-header weekend-header">六</div>
   </div>
   
-  <div class="sync-status" id="syncStatus">☁️ 雲端連線中...</div>
+  <div class="sync-status" id="syncStatus" onclick="loadCloudData()">☁️ 點擊手動同步雲端資料</div>
 </div>
 
 <div class="modal" id="eventModal">
@@ -244,33 +241,14 @@
   let selectedDateKey = null;
   let events = {};
 
-  // 公用雲端資料庫 API (JSONBin)
-  const BIN_ID = '66d8e273e41b4d34e42a98f0'; 
-  const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+  // 開放式全域同步 Endpoint (JSONStorage)
+  const API_URL = 'https://api.jsonstorage.net/v1/json/00000000-0000-0000-0000-000000000000/family-calendar-yslee984';
 
-  // 台灣國定假日資料庫 (固定+近幾年主要農曆節日)
   const holidays = {
-    // 固定節日
-    "01-01": "元旦",
-    "02-28": "和平紀念日",
-    "04-04": "兒童節",
-    "04-05": "清明節",
-    "05-01": "勞動節",
-    "10-10": "國慶日",
-    
-    // 2026 特殊節日 (含中秋節 09-25)
-    "2026-02-16": "除夕",
-    "2026-02-17": "春節",
-    "2026-02-18": "初二",
-    "2026-02-19": "初三",
-    "2026-06-19": "端午節",
-    "2026-09-25": "中秋節",
-
-    // 2025 特殊節日
-    "2025-01-28": "除夕",
-    "2025-01-29": "春節",
-    "2025-05-31": "端午節",
-    "2025-10-06": "中秋節"
+    "01-01": "元旦", "02-28": "和平紀念日", "04-04": "兒童節",
+    "04-05": "清明節", "05-01": "勞動節", "10-10": "國慶日",
+    "2026-02-16": "除夕", "2026-02-17": "春節", "2026-02-18": "初二",
+    "2026-02-19": "初三", "2026-06-19": "端午節", "2026-09-25": "中秋節"
   };
 
   const monthYearDisplay = document.getElementById('monthYearDisplay');
@@ -278,15 +256,14 @@
   const eventModal = document.getElementById('eventModal');
   const syncStatus = document.getElementById('syncStatus');
 
-  // 從雲端載入資料
   async function loadCloudData() {
     syncStatus.textContent = "☁️ 雲端同步中...";
     try {
-      const res = await fetch(`${API_URL}/latest`);
+      const res = await fetch(API_URL);
       if (res.ok) {
-        const data = await res.json();
-        events = data.record || {};
-        syncStatus.textContent = "✅ 已同步最新資料";
+        events = await res.json();
+        localStorage.setItem('familyCalendarEvents', JSON.stringify(events));
+        syncStatus.textContent = "✅ 資料已同步 (點擊可刷新)";
       } else {
         fallbackLocal();
       }
@@ -298,10 +275,9 @@
 
   function fallbackLocal() {
     events = JSON.parse(localStorage.getItem('familyCalendarEvents') || '{}');
-    syncStatus.textContent = "⚠️ 本地備份模式";
+    syncStatus.textContent = "⚠️ 本地備份模式 (點擊重試同步)";
   }
 
-  // 儲存至雲端
   async function saveCloudData() {
     syncStatus.textContent = "⏳ 儲存至雲端...";
     localStorage.setItem('familyCalendarEvents', JSON.stringify(events));
@@ -311,9 +287,9 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(events)
       });
-      syncStatus.textContent = "✅ 儲存成功，所有人皆已更新";
+      syncStatus.textContent = "✅ 儲存成功，所有裝置已更新";
     } catch (e) {
-      syncStatus.textContent = "⚠️ 雲端儲存失敗，已存在本地";
+      syncStatus.textContent = "⚠️ 雲端寫入失敗，已儲存於本地";
     }
   }
 
@@ -350,7 +326,6 @@
       const dayOfWeek = new Date(year, month, day).getDay();
       const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
       
-      // 比對固定假日或指定年份假日
       const holidayName = holidays[dateKey] || holidays[mmdd];
       const isHoliday = isWeekend || holidayName;
 
@@ -461,8 +436,9 @@
     await saveCloudData();
   }
 
-  // 初始化載入雲端資料
+  // 初始載入與 10 秒自動輪詢同步
   loadCloudData();
+  setInterval(loadCloudData, 10000);
 </script>
 </body>
 </html>
