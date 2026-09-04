@@ -2,12 +2,11 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>溫馨可愛線上行事曆</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>線上行事曆</title>
 
-  <!-- 手機主畫面圖示與全螢幕設定 -->
-  <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/180/calendar.png">
-  <link rel="icon" type="image/png" href="https://img.icons8.com/isometric/180/calendar.png">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/180/home.png">
+  <link rel="icon" type="image/png" href="https://img.icons8.com/isometric/180/home.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="家庭行事曆">
@@ -15,29 +14,27 @@
 
   <style>
     :root {
-      /* 方案 A：柔和夢幻漸層色彩 */
       --bg-gradient: linear-gradient(135deg, #ffd1dc 0%, #fff0f5 35%, #e6f2ff 70%, #e8f8f5 100%);
-      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-bg: rgba(255, 255, 255, 0.95);
       --primary: #8a70d6;
       --primary-hover: #755bbd;
       --text-main: #4a4a6a;
       --border-color: #eee3f5;
       
-      /* 假日與今天色彩 */
       --holiday-bg: #fff0f3;
       --holiday-border: #ffccd5;
       --today-bg: #eef2ff;
       --today-border: #a5b4fc;
     }
 
-    * { box-sizing: border-box; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif; }
     
     body { 
       background: var(--bg-gradient); 
       background-attachment: fixed;
       color: var(--text-main); 
       margin: 0; 
-      padding: 20px; 
+      padding: 12px; 
       display: flex; 
       justify-content: center;
       min-height: 100vh;
@@ -45,91 +42,145 @@
 
     .container { 
       width: 100%; 
-      max-width: 920px; 
+      max-width: 800px; 
       background: var(--card-bg); 
       backdrop-filter: blur(10px);
       border-radius: 20px; 
-      box-shadow: 0 10px 25px rgba(138, 112, 214, 0.15); 
-      padding: 24px; 
+      box-shadow: 0 8px 20px rgba(138, 112, 214, 0.12); 
+      padding: 16px; 
       border: 2px solid #ffffff;
+      margin: auto 0;
     }
     
-    /* Header & Navigation */
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .header h2 { margin: 0; font-size: 1.6rem; color: #5a4b82; font-weight: 700; }
-    .nav-group { display: flex; gap: 8px; }
+    /* Header & Navigation RWD 修正 */
+    .header { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 12px; 
+      margin-bottom: 16px; 
+    }
+    
+    @media (min-width: 600px) {
+      .header {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
+
+    .header h2 { 
+      margin: 0; 
+      font-size: 1.4rem; 
+      color: #5a4b82; 
+      font-weight: 700; 
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .nav-group { display: flex; gap: 6px; }
     .nav-btn { 
       background: #ffffff; 
       border: 1px solid var(--border-color); 
-      padding: 8px 16px; 
-      border-radius: 20px; 
+      padding: 6px 12px; 
+      border-radius: 16px; 
       cursor: pointer; 
       font-weight: 600; 
+      font-size: 0.85rem;
       color: var(--text-main);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
       transition: all 0.2s ease; 
     }
-    .nav-btn:hover { background: #f7f0fa; transform: translateY(-1px); }
+    .nav-btn:hover { background: #f7f0fa; }
     .today-btn { background: var(--primary); color: white; border: none; }
-    .today-btn:hover { background: var(--primary-hover); }
 
-    /* Calendar Grid */
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .weekday-header { text-align: center; font-weight: bold; padding: 10px 0; color: #8c7aa9; font-size: 0.95rem; }
+    /* Calendar Grid 手機響應式優化 */
+    .calendar-grid { 
+      display: grid; 
+      grid-template-columns: repeat(7, 1fr); 
+      gap: 4px; 
+    }
+    
+    .weekday-header { 
+      text-align: center; 
+      font-weight: bold; 
+      padding: 6px 0; 
+      color: #8c7aa9; 
+      font-size: 0.85rem; 
+    }
     .weekday-header.weekend-header { color: #ff6b81; }
 
     .day-cell { 
-      min-height: 105px; 
+      min-height: 72px; 
       border: 1px solid var(--border-color); 
-      border-radius: 12px; 
-      padding: 6px; 
+      border-radius: 10px; 
+      padding: 4px; 
       background: #ffffff; 
       cursor: pointer; 
       transition: all 0.2s; 
       display: flex; 
       flex-direction: column; 
-      position: relative;
+      overflow: hidden;
     }
-    .day-cell:hover { border-color: var(--primary); transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .day-cell.empty { background: rgba(255, 255, 255, 0.3); border-style: dashed; cursor: default; }
-    .day-cell.empty:hover { transform: none; box-shadow: none; }
     
-    /* 週末與假日樣式 (淡粉紅底) */
+    @media (min-width: 600px) {
+      .day-cell { min-height: 100px; padding: 6px; }
+      .calendar-grid { gap: 6px; }
+    }
+
+    .day-cell.empty { background: rgba(255, 255, 255, 0.2); border-style: dashed; cursor: default; }
+    
     .day-cell.is-holiday { 
       background-color: var(--holiday-bg); 
       border-color: var(--holiday-border); 
     }
     .day-cell.is-holiday .day-number { color: #e64980; }
 
-    /* 今天樣式 */
     .day-cell.is-today { 
       background-color: var(--today-bg); 
       border: 2px solid var(--today-border); 
     }
     .day-cell.is-today .day-number { color: #3b82f6; }
 
-    .day-header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .day-number { font-weight: bold; font-size: 0.95rem; }
-    .today-badge { font-size: 0.65rem; background: #6366f1; color: white; padding: 2px 6px; border-radius: 10px; }
-    .holiday-tag { font-size: 0.65rem; background: #ff85a1; color: white; padding: 1px 5px; border-radius: 8px; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .day-header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+    .day-number { font-weight: bold; font-size: 0.85rem; }
+    .today-badge { font-size: 0.6rem; background: #6366f1; color: white; padding: 1px 4px; border-radius: 8px; }
+    .holiday-tag { font-size: 0.58rem; background: #ff85a1; color: white; padding: 1px 4px; border-radius: 6px; white-space: nowrap; }
 
-    /* Event Badges & Notes */
-    .badge { font-size: 0.75rem; color: white; padding: 3px 6px; border-radius: 6px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .note-text { font-size: 0.72rem; color: #6b7280; margin-top: 3px; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .badge { 
+      font-size: 0.68rem; 
+      color: white; 
+      padding: 2px 4px; 
+      border-radius: 4px; 
+      margin-top: 2px; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      font-weight: 500; 
+    }
+    .note-text { 
+      font-size: 0.65rem; 
+      color: #6b7280; 
+      margin-top: 2px; 
+      font-style: italic; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
+
+    /* Sync Indicator */
+    .sync-status { font-size: 0.75rem; color: #8c7aa9; text-align: center; margin-top: 10px; }
 
     /* Modal Styling */
-    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(74, 74, 106, 0.4); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 100; }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(74, 74, 106, 0.4); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 100; padding: 16px; }
     .modal.active { display: flex; }
-    .modal-content { background: white; padding: 24px; border-radius: 16px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .modal-content h3 { margin-top: 0; margin-bottom: 16px; color: #5a4b82; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #5a4b82; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; outline: none; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
-    .btn { padding: 8px 16px; border-radius: 20px; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+    .modal-content { background: white; padding: 20px; border-radius: 16px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .modal-content h3 { margin-top: 0; margin-bottom: 14px; color: #5a4b82; font-size: 1.1rem; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #5a4b82; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.85rem; outline: none; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .btn { padding: 6px 14px; border-radius: 16px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
     .btn-save { background: var(--primary); color: white; }
-    .btn-save:hover { background: var(--primary-hover); }
     .btn-delete { background: #ff6b6b; color: white; }
     .btn-cancel { background: #e2e8f0; color: #4a5568; }
   </style>
@@ -138,12 +189,12 @@
 
 <div class="container">
   <div class="header">
+    <h2 id="monthYearDisplay"></h2>
     <div class="nav-group">
       <button class="nav-btn" onclick="changeMonth(-1)">&lt; 上個月</button>
-      <button class="nav-btn" onclick="changeMonth(1)">下個月 &gt;</button>
       <button class="nav-btn today-btn" onclick="goToToday()">今天</button>
+      <button class="nav-btn" onclick="changeMonth(1)">下個月 &gt;</button>
     </div>
-    <h2 id="monthYearDisplay"></h2>
   </div>
 
   <div class="calendar-grid" id="calendarGrid">
@@ -155,9 +206,10 @@
     <div class="weekday-header">五</div>
     <div class="weekday-header weekend-header">六</div>
   </div>
+  
+  <div class="sync-status" id="syncStatus">☁️ 雲端連線中...</div>
 </div>
 
-<!-- 編輯/新增事件彈窗 -->
 <div class="modal" id="eventModal">
   <div class="modal-content">
     <h3 id="modalDateTitle">標記日期</h3>
@@ -172,7 +224,7 @@
       </select>
     </div>
     <div class="form-group">
-      <label>自訂標籤名稱 (若選擇自訂類型)</label>
+      <label>自訂標籤名稱</label>
       <input type="text" id="customTag" placeholder="例如：聚餐、露營">
     </div>
     <div class="form-group">
@@ -180,9 +232,9 @@
       <textarea id="eventNote" rows="3" placeholder="填寫詳細說明..."></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-delete" onclick="deleteEvent()" id="deleteBtn" style="display:none;">清除標記</button>
+      <button class="btn btn-delete" onclick="deleteEvent()" id="deleteBtn" style="display:none;">清除</button>
       <button class="btn btn-cancel" onclick="closeModal()">取消</button>
-      <button class="btn btn-save" onclick="saveEvent()">儲存</button>
+      <button class="btn btn-save" onclick="saveEvent()">儲存同步</button>
     </div>
   </div>
 </div>
@@ -190,21 +242,80 @@
 <script>
   let currentDate = new Date();
   let selectedDateKey = null;
-  let events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
+  let events = {};
 
-  // 台灣主要國定節日資料庫 (MM-DD)
+  // 公用雲端資料庫 API (JSONBin)
+  const BIN_ID = '66d8e273e41b4d34e42a98f0'; 
+  const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+  // 台灣國定假日資料庫 (固定+近幾年主要農曆節日)
   const holidays = {
+    // 固定節日
     "01-01": "元旦",
     "02-28": "和平紀念日",
     "04-04": "兒童節",
     "04-05": "清明節",
     "05-01": "勞動節",
-    "10-10": "國慶日"
+    "10-10": "國慶日",
+    
+    // 2026 特殊節日 (含中秋節 09-25)
+    "2026-02-16": "除夕",
+    "2026-02-17": "春節",
+    "2026-02-18": "初二",
+    "2026-02-19": "初三",
+    "2026-06-19": "端午節",
+    "2026-09-25": "中秋節",
+
+    // 2025 特殊節日
+    "2025-01-28": "除夕",
+    "2025-01-29": "春節",
+    "2025-05-31": "端午節",
+    "2025-10-06": "中秋節"
   };
 
   const monthYearDisplay = document.getElementById('monthYearDisplay');
   const calendarGrid = document.getElementById('calendarGrid');
   const eventModal = document.getElementById('eventModal');
+  const syncStatus = document.getElementById('syncStatus');
+
+  // 從雲端載入資料
+  async function loadCloudData() {
+    syncStatus.textContent = "☁️ 雲端同步中...";
+    try {
+      const res = await fetch(`${API_URL}/latest`);
+      if (res.ok) {
+        const data = await res.json();
+        events = data.record || {};
+        syncStatus.textContent = "✅ 已同步最新資料";
+      } else {
+        fallbackLocal();
+      }
+    } catch (e) {
+      fallbackLocal();
+    }
+    renderCalendar();
+  }
+
+  function fallbackLocal() {
+    events = JSON.parse(localStorage.getItem('familyCalendarEvents') || '{}');
+    syncStatus.textContent = "⚠️ 本地備份模式";
+  }
+
+  // 儲存至雲端
+  async function saveCloudData() {
+    syncStatus.textContent = "⏳ 儲存至雲端...";
+    localStorage.setItem('familyCalendarEvents', JSON.stringify(events));
+    try {
+      await fetch(API_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(events)
+      });
+      syncStatus.textContent = "✅ 儲存成功，所有人皆已更新";
+    } catch (e) {
+      syncStatus.textContent = "⚠️ 雲端儲存失敗，已存在本地";
+    }
+  }
 
   function renderCalendar() {
     const year = currentDate.getFullYear();
@@ -219,7 +330,6 @@
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // 補空白
     for (let i = 0; i < firstDay; i++) {
       const emptyCell = document.createElement('div');
       emptyCell.className = 'day-cell empty';
@@ -239,7 +349,9 @@
       
       const dayOfWeek = new Date(year, month, day).getDay();
       const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-      const holidayName = holidays[mmdd];
+      
+      // 比對固定假日或指定年份假日
+      const holidayName = holidays[dateKey] || holidays[mmdd];
       const isHoliday = isWeekend || holidayName;
 
       if (isHoliday) cell.classList.add('is-holiday');
@@ -323,7 +435,7 @@
     eventModal.classList.remove('active');
   }
 
-  function saveEvent() {
+  async function saveEvent() {
     const select = document.getElementById('eventType');
     const selectedOption = select.options[select.selectedIndex];
     const customTag = document.getElementById('customTag').value.trim();
@@ -337,19 +449,20 @@
     }
 
     events[selectedDateKey] = { tag, color, note };
-    localStorage.setItem('calendarEvents', JSON.stringify(events));
     closeModal();
     renderCalendar();
+    await saveCloudData();
   }
 
-  function deleteEvent() {
+  async function deleteEvent() {
     delete events[selectedDateKey];
-    localStorage.setItem('calendarEvents', JSON.stringify(events));
     closeModal();
     renderCalendar();
+    await saveCloudData();
   }
 
-  renderCalendar();
+  // 初始化載入雲端資料
+  loadCloudData();
 </script>
 </body>
 </html>
