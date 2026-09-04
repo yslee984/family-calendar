@@ -11,21 +11,22 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="家庭行事曆">
-  <meta name="theme-color" content="#ffd1dc">
+  <meta name="theme-color" content="#fffde7">
 
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #ffd1dc 0%, #fff0f5 35%, #e6f2ff 70%, #e8f8f5 100%);
-      --card-bg: rgba(255, 255, 255, 0.95);
-      --primary: #8a70d6;
-      --primary-hover: #755bbd;
-      --text-main: #4a4a6a;
-      --border-color: #eee3f5;
+      /* 淡黃、淡綠、淡藍溫馨柔和漸變背景 */
+      --bg-gradient: linear-gradient(135deg, #fffde7 0%, #e8f5e9 50%, #e0f7fa 100%);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --primary: #5c6bc0;
+      --primary-hover: #3f51b5;
+      --text-main: #37474f;
+      --border-color: #e0e0e0;
       
-      --holiday-bg: #fff0f3;
-      --holiday-border: #ffccd5;
-      --today-bg: #eef2ff;
-      --today-border: #a5b4fc;
+      --holiday-bg: #fff3e0;
+      --holiday-border: #ffe0b2;
+      --today-bg: #e8eaf6;
+      --today-border: #9fa8da;
     }
 
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif; }
@@ -35,7 +36,7 @@
       background-attachment: fixed;
       color: var(--text-main); 
       margin: 0; 
-      padding: 12px; 
+      padding: 8px; 
       display: flex; 
       justify-content: center;
       min-height: 100vh;
@@ -47,8 +48,8 @@
       background: var(--card-bg); 
       backdrop-filter: blur(10px);
       border-radius: 20px; 
-      box-shadow: 0 8px 20px rgba(138, 112, 214, 0.12); 
-      padding: 16px; 
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); 
+      padding: 12px; 
       border: 2px solid #ffffff;
       margin: auto 0;
     }
@@ -57,21 +58,23 @@
       display: flex; 
       flex-direction: column; 
       align-items: center; 
-      gap: 12px; 
-      margin-bottom: 16px; 
+      gap: 8px; 
+      margin-bottom: 12px; 
     }
     
     @media (min-width: 600px) {
+      .container { padding: 16px; }
       .header {
         flex-direction: row;
         justify-content: space-between;
+        margin-bottom: 16px;
       }
     }
 
     .header h2 { 
       margin: 0; 
-      font-size: 1.4rem; 
-      color: #5a4b82; 
+      font-size: 1.3rem; 
+      color: #2c3e50; 
       font-weight: 700; 
       text-align: center;
       white-space: nowrap;
@@ -90,29 +93,29 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
       transition: all 0.2s ease; 
     }
-    .nav-btn:hover { background: #f7f0fa; }
+    .nav-btn:hover { background: #f5f5f5; }
     .today-btn { background: var(--primary); color: white; border: none; }
 
     .calendar-grid { 
       display: grid; 
       grid-template-columns: repeat(7, 1fr); 
-      gap: 4px; 
+      gap: 3px; 
     }
     
     .weekday-header { 
       text-align: center; 
       font-weight: bold; 
-      padding: 6px 0; 
-      color: #8c7aa9; 
+      padding: 4px 0; 
+      color: #78909c; 
       font-size: 0.85rem; 
     }
-    .weekday-header.weekend-header { color: #ff6b81; }
+    .weekday-header.weekend-header { color: #e53935; }
 
     .day-cell { 
-      min-height: 72px; 
+      min-height: 80px; 
       border: 1px solid var(--border-color); 
       border-radius: 10px; 
-      padding: 4px; 
+      padding: 3px; 
       background: #ffffff; 
       cursor: pointer; 
       transition: all 0.2s; 
@@ -122,43 +125,69 @@
     }
     
     @media (min-width: 600px) {
-      .day-cell { min-height: 100px; padding: 6px; }
+      .day-cell { min-height: 105px; padding: 6px; }
       .calendar-grid { gap: 6px; }
     }
 
-    .day-cell.empty { background: rgba(255, 255, 255, 0.2); border-style: dashed; cursor: default; }
+    .day-cell.empty { background: rgba(255, 255, 255, 0.3); border-style: dashed; cursor: default; }
     
     .day-cell.is-holiday { 
       background-color: var(--holiday-bg); 
       border-color: var(--holiday-border); 
     }
-    .day-cell.is-holiday .day-number { color: #e64980; }
+    .day-cell.is-holiday .day-number { color: #d81b60; }
 
     .day-cell.is-today { 
       background-color: var(--today-bg); 
       border: 2px solid var(--today-border); 
     }
-    .day-cell.is-today .day-number { color: #3b82f6; }
+    .day-cell.is-today .day-number { color: #1e88e5; }
 
     .day-header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
     .day-number { font-weight: bold; font-size: 0.85rem; }
-    .today-badge { font-size: 0.6rem; background: #6366f1; color: white; padding: 1px 4px; border-radius: 8px; }
-    .holiday-tag { font-size: 0.58rem; background: #ff85a1; color: white; padding: 1px 4px; border-radius: 6px; white-space: nowrap; }
+    .today-badge { font-size: 0.58rem; background: #3f51b5; color: white; padding: 1px 4px; border-radius: 6px; }
+    .holiday-tag { font-size: 0.55rem; background: #ff7043; color: white; padding: 1px 4px; border-radius: 6px; white-space: nowrap; }
 
+    /* 多重標籤容器 */
+    .badges-wrapper {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 2px;
+      flex-grow: 1;
+      align-content: flex-start;
+    }
+
+    /* 標籤樣式：電腦版橫排，手機版直排（前兩個字） */
     .badge { 
-      font-size: 0.68rem; 
+      font-size: 0.72rem; 
       color: white; 
       padding: 2px 4px; 
       border-radius: 4px; 
-      margin-top: 2px; 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      font-weight: 500; 
+      font-weight: 600; 
+      text-align: center;
+      line-height: 1.1;
+      letter-spacing: 1px;
     }
+
+    /* 手機版直書優化：只顯示前兩字 */
+    @media (max-width: 599px) {
+      .badges-wrapper {
+        flex-direction: row;
+        justify-content: flex-start;
+      }
+      .badge {
+        writing-mode: vertical-lr;
+        text-orientation: upright;
+        padding: 4px 2px;
+        font-size: 0.7rem;
+        max-height: 48px;
+      }
+    }
+
     .note-text { 
-      font-size: 0.65rem; 
-      color: #6b7280; 
+      font-size: 0.6rem; 
+      color: #616161; 
       margin-top: 2px; 
       font-style: italic; 
       white-space: nowrap; 
@@ -166,20 +195,42 @@
       text-overflow: ellipsis; 
     }
 
-    .sync-status { font-size: 0.75rem; color: #8c7aa9; text-align: center; margin-top: 10px; }
+    .sync-status { font-size: 0.75rem; color: #546e7a; text-align: center; margin-top: 8px; }
 
-    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(74, 74, 106, 0.4); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 100; padding: 16px; }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0, 0, 0, 0.35); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 100; padding: 16px; }
     .modal.active { display: flex; }
-    .modal-content { background: white; padding: 20px; border-radius: 16px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .modal-content h3 { margin-top: 0; margin-bottom: 14px; color: #5a4b82; font-size: 1.1rem; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #5a4b82; }
+    .modal-content { background: white; padding: 18px; border-radius: 16px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); max-height: 90vh; overflow-y: auto; }
+    .modal-content h3 { margin-top: 0; margin-bottom: 12px; color: #2c3e50; font-size: 1.1rem; }
+    
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #37474f; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.85rem; outline: none; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    
+    .existing-tags-box {
+      margin-bottom: 12px;
+      background: #f8f9fa;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    .existing-tag-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 8px;
+      margin-bottom: 4px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #eee;
+    }
+    .existing-tag-item:last-child { margin-bottom: 0; }
+    .remove-tag-btn { color: #e53935; cursor: pointer; font-weight: bold; font-size: 0.9rem; padding: 0 4px; }
+
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
     .btn { padding: 6px 14px; border-radius: 16px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .btn-add { background: #26a69a; color: white; }
     .btn-save { background: var(--primary); color: white; }
-    .btn-delete { background: #ff6b6b; color: white; }
-    .btn-cancel { background: #e2e8f0; color: #4a5568; }
+    .btn-cancel { background: #cfd8dc; color: #37474f; }
   </style>
 </head>
 <body>
@@ -210,14 +261,21 @@
 <div class="modal" id="eventModal">
   <div class="modal-content">
     <h3 id="modalDateTitle">標記日期</h3>
+    
+    <!-- 已存在的標籤清單 -->
+    <div id="existingTagsContainer" class="existing-tags-box" style="display:none;">
+      <label style="font-size:0.75rem; color:#78909c; font-weight:bold; display:block; margin-bottom:4px;">目前已加入的標籤：</label>
+      <div id="existingTagsList"></div>
+    </div>
+
     <div class="form-group">
-      <label>標籤類別與顏色</label>
+      <label>新增標籤類別與顏色</label>
       <select id="eventType">
-        <option value="值班日" data-color="#ff6b6b">值班日 (珊瑚紅)</option>
-        <option value="小孩日" data-color="#4d96ff">小孩日 (天空藍)</option>
-        <option value="休假日" data-color="#6bcb77">休假日 (薄荷綠)</option>
-        <option value="重要事項" data-color="#ffb830">重要事項 (溫暖黃)</option>
-        <option value="自訂類型" data-color="#9b51e0">自訂類型 (夢幻紫)</option>
+        <option value="值班日" data-color="#e53935">值班日 (珊瑚紅)</option>
+        <option value="小孩日" data-color="#1e88e5">小孩日 (天空藍)</option>
+        <option value="休假日" data-color="#43a047">休假日 (薄荷綠)</option>
+        <option value="重要事項" data-color="#fb8c00">重要事項 (溫暖黃)</option>
+        <option value="自訂類型" data-color="#8e24aa">自訂類型 (夢幻紫)</option>
       </select>
     </div>
     <div class="form-group">
@@ -226,12 +284,12 @@
     </div>
     <div class="form-group">
       <label>備註事項</label>
-      <textarea id="eventNote" rows="3" placeholder="填寫詳細說明..."></textarea>
+      <textarea id="eventNote" rows="2" placeholder="填寫詳細說明..."></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-delete" onclick="deleteEvent()" id="deleteBtn" style="display:none;">清除</button>
       <button class="btn btn-cancel" onclick="closeModal()">取消</button>
-      <button class="btn btn-save" onclick="saveEvent()">儲存同步</button>
+      <button class="btn btn-add" onclick="addTagToDate()">＋ 加入標籤</button>
+      <button class="btn btn-save" onclick="saveEvent()">完成儲存</button>
     </div>
   </div>
 </div>
@@ -252,6 +310,7 @@
   let currentDate = new Date();
   let selectedDateKey = null;
   let events = {};
+  let tempTagsList = []; // 暫存目前編輯中的標籤陣列
 
   const holidays = {
     "01-01": "元旦", "02-28": "和平紀念日", "04-04": "兒童節",
@@ -265,13 +324,22 @@
   const eventModal = document.getElementById('eventModal');
   const syncStatus = document.getElementById('syncStatus');
 
-  // 即時監聽 Firebase 資料庫變化（秒級推播更新）
+  // 即時監聽 Firebase 資料庫變化
   eventsRef.on('value', (snapshot) => {
     events = snapshot.val() || {};
     renderCalendar();
     syncStatus.textContent = "🟢 即時同步中 (" + new Date().toLocaleTimeString() + ")";
   }, (error) => {
-    syncStatus.textContent = "🔴 連線失敗，請檢查權限設定";
+    syncStatus.textContent = "🔴 連線失敗，請檢查網路或設定";
+  });
+
+  // 判斷是否為手機畫面
+  function isMobileView() {
+    return window.innerWidth < 600;
+  }
+
+  window.addEventListener('resize', () => {
+    renderCalendar();
   });
 
   function renderCalendar() {
@@ -327,7 +395,22 @@
       
       if (events[dateKey]) {
         const item = events[dateKey];
-        cellContent += `<div class="badge" style="background-color: ${item.color}">${item.tag}</div>`;
+        // 相容舊資料格式（若舊資料不是陣列，自動轉成陣列）
+        const tagsList = Array.isArray(item.tags) ? item.tags : (item.tag ? [{ tag: item.tag, color: item.color }] : []);
+
+        if (tagsList.length > 0) {
+          cellContent += `<div class="badges-wrapper">`;
+          tagsList.forEach(t => {
+            // 手機版：截取前兩個字，直排更清晰
+            let displayText = t.tag;
+            if (isMobileView() && displayText.length > 2) {
+              displayText = displayText.substring(0, 2);
+            }
+            cellContent += `<div class="badge" style="background-color: ${t.color}">${displayText}</div>`;
+          });
+          cellContent += `</div>`;
+        }
+
         if (item.note) {
           cellContent += `<div class="note-text" title="${item.note}">📝 ${item.note}</div>`;
         }
@@ -353,49 +436,57 @@
     selectedDateKey = dateKey;
     document.getElementById('modalDateTitle').textContent = `${dateKey} 標記`;
     
-    const select = document.getElementById('eventType');
-    const customInput = document.getElementById('customTag');
     const noteInput = document.getElementById('eventNote');
-    const deleteBtn = document.getElementById('deleteBtn');
+    document.getElementById('customTag').value = '';
 
     if (events[dateKey]) {
       const item = events[dateKey];
       noteInput.value = item.note || '';
-      deleteBtn.style.display = 'block';
-      
-      let found = false;
-      for (let opt of select.options) {
-        if (opt.value === item.tag) {
-          select.value = item.tag;
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        select.value = '自訂類型';
-        customInput.value = item.tag;
+      // 載入現有標籤
+      if (Array.isArray(item.tags)) {
+        tempTagsList = [...item.tags];
+      } else if (item.tag) {
+        tempTagsList = [{ tag: item.tag, color: item.color }];
       } else {
-        customInput.value = '';
+        tempTagsList = [];
       }
     } else {
-      select.selectedIndex = 0;
-      customInput.value = '';
       noteInput.value = '';
-      deleteBtn.style.display = 'none';
+      tempTagsList = [];
     }
 
+    renderModalTags();
     eventModal.classList.add('active');
   }
 
-  function closeModal() {
-    eventModal.classList.remove('active');
+  function renderModalTags() {
+    const container = document.getElementById('existingTagsContainer');
+    const list = document.getElementById('existingTagsList');
+    
+    if (tempTagsList.length === 0) {
+      container.style.display = 'none';
+      list.innerHTML = '';
+      return;
+    }
+
+    container.style.display = 'block';
+    list.innerHTML = '';
+
+    tempTagsList.forEach((t, index) => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'existing-tag-item';
+      itemDiv.innerHTML = `
+        <span class="badge" style="background-color: ${t.color}; font-size: 0.75rem;">${t.tag}</span>
+        <span class="remove-tag-btn" onclick="removeTag(${index})">✕ 刪除</span>
+      `;
+      list.appendChild(itemDiv);
+    });
   }
 
-  async function saveEvent() {
+  function addTagToDate() {
     const select = document.getElementById('eventType');
     const selectedOption = select.options[select.selectedIndex];
     const customTag = document.getElementById('customTag').value.trim();
-    const note = document.getElementById('eventNote').value.trim();
 
     let tag = select.value;
     let color = selectedOption.getAttribute('data-color');
@@ -404,15 +495,35 @@
       tag = customTag || '其他';
     }
 
-    closeModal();
-    // 寫入 Firebase (會觸發 eventsRef.on 自動更新介面)
-    await eventsRef.child(selectedDateKey).set({ tag, color, note });
+    tempTagsList.push({ tag, color });
+    document.getElementById('customTag').value = '';
+    renderModalTags();
   }
 
-  async function deleteEvent() {
+  function removeTag(index) {
+    tempTagsList.splice(index, 1);
+    renderModalTags();
+  }
+
+  function closeModal() {
+    eventModal.classList.remove('active');
+  }
+
+  async function saveEvent() {
+    const note = document.getElementById('eventNote').value.trim();
+
     closeModal();
-    // 從 Firebase 刪除資料
-    await eventsRef.child(selectedDateKey).remove();
+
+    if (tempTagsList.length === 0 && !note) {
+      // 若無標籤且無備註，直接刪除該日資料
+      await eventsRef.child(selectedDateKey).remove();
+    } else {
+      // 儲存包含多重標籤的資料結構
+      await eventsRef.child(selectedDateKey).set({
+        tags: tempTagsList,
+        note: note
+      });
+    }
   }
 </script>
 </body>
